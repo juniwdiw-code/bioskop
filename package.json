@@ -1,0 +1,18 @@
+{
+  "name": "tiket-bioskop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sistem tiket bioskop: Vercel (frontend + API) dengan database Neon PostgreSQL",
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "dev": "vercel dev",
+    "db:schema": "node --env-file=.env scripts/run-sql.js db/schema.sql",
+    "db:seed": "node --env-file=.env scripts/run-sql.js db/seed.sql",
+    "db:setup": "node --env-file=.env scripts/run-sql.js db/schema.sql db/seed.sql",
+    "db:reset": "node --env-file=.env scripts/run-sql.js db/reset.sql db/schema.sql db/seed.sql"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  }
+}

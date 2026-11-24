@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistem Tiket Bioskop</title>
+<style>
+:root{--bg:#fafaf9;--card:#fff;--tx:#18181b;--mu:#8a8a93;--ac:#18181b;--ac2:#fff;--bd:#ececea;--ok:#15803d;--seat:#f1f1ef;--taken:#e4e4e1;--er:#dc2626;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e10;--card:#161618;--tx:#f4f4f5;--mu:#8b8b94;--ac:#f4f4f5;--ac2:#0e0e10;--bd:#26262a;--ok:#4ade80;--seat:#1f1f23;--taken:#26262a;--er:#f87171}}
+:root[data-theme="dark"]{--bg:#0e0e10;--card:#161618;--tx:#f4f4f5;--mu:#8b8b94;--ac:#f4f4f5;--ac2:#0e0e10;--bd:#26262a;--ok:#4ade80;--seat:#1f1f23;--taken:#26262a;--er:#f87171}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+#view{flex:1 1 0;min-height:0;overflow:hidden}
+.adm #view{overflow-y:auto;scrollbar-width:none}.adm #view::-webkit-scrollbar{display:none}
+#fit{width:100%}
+.pg{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--mu);margin-top:6px}
+.pg .btn{width:auto;margin:0;padding:8px 14px;font-size:.85rem}
+.lgs{font-size:.82rem;color:var(--mu);margin-top:3px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+.wrap{max-width:480px;margin:0 auto;padding:16px 18px;height:100dvh;display:flex;flex-direction:column}
+header p{margin:4px 0 0;color:var(--mu);font-size:.9rem}
+h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
+.steps{display:flex;gap:4px;margin:18px 0 20px}
+.steps i{flex:1;height:3px;border-radius:3px;background:var(--bd)}
+.steps i.on{background:var(--ac)}
+h2{margin:0 0 14px;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--mu)}
+label{display:block;font-size:.85rem;color:var(--mu);margin-bottom:6px}
+input{width:100%;padding:14px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font-size:1rem;outline:0}
+input:focus{border-color:var(--tx)}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:15px 16px;margin-bottom:10px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font-size:1rem;cursor:pointer}
+.opt small{color:var(--mu)}
+.opt:hover,.opt.sel{border-color:var(--tx)}
+.btn{display:block;width:100%;padding:14px;margin-top:14px;border:0;border-radius:12px;background:var(--ac);color:var(--ac2);font-size:1rem;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--mu);margin-top:4px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.screen{text-align:center;font-size:.7rem;letter-spacing:.3em;color:var(--mu);border-top:2px solid var(--tx);padding-top:6px;margin:0 20px 20px}
+.hall{display:grid;grid-template-columns:16px repeat(4,1fr) 12px repeat(4,1fr) 12px repeat(4,1fr);gap:4px;align-items:center}
+.rl{font-size:.7rem;color:var(--mu);text-align:center}
+.seat{width:100%;aspect-ratio:1;padding:0;border:1.5px solid var(--mu);border-radius:6px;background:var(--card);color:var(--tx);font-size:.65rem;font-weight:500;cursor:pointer}
+.seat.taken{background:var(--taken);border-color:var(--taken);color:var(--er);font-size:.8rem;font-weight:700;cursor:not-allowed}
+.seat.sel{background:var(--ac);border-color:var(--ac);color:var(--ac2)}
+.legend{display:flex;gap:18px;justify-content:center;font-size:.8rem;color:var(--mu);margin-top:16px}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:4px;background:var(--card);border:1.5px solid var(--mu)}
+.sw.s1{background:var(--ac);border-color:var(--ac)}.sw.s2{background:var(--taken);border-color:var(--taken)}
+.chips.big button{padding:14px;font-weight:600}
+.chips button.on{background:var(--ac);color:var(--ac2);border-color:var(--ac)}
+.chips.pm{flex-wrap:wrap}.chips.pm button{flex:1 1 40%;padding:12px 4px}
+.pay-info{margin-top:14px;text-align:center}.pay-info .row{text-align:left}
+.qr{display:grid;grid-template-columns:repeat(11,1fr);width:176px;margin:0 auto 10px;padding:8px;background:#fff;border:1px solid var(--bd);border-radius:10px}
+.qr i{display:block;aspect-ratio:1}.qr i.b{background:#000}
+select{width:100%;padding:14px;border:1px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font-size:1rem}
+.fr{display:grid;gap:8px}
+.del{border:0;background:transparent;color:var(--er);cursor:pointer;font-size:.85rem}
+.acard{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.big2{font-size:1.6rem;font-weight:700}
+.stf{display:block;margin:34px auto 0;background:none;border:0;color:var(--mu);opacity:.3;font-size:.68rem;cursor:pointer}.stf:hover{opacity:.8}
+.alert{margin-bottom:18px;padding:12px 14px;border:1px solid var(--er);border-left-width:4px;border-radius:10px;font-size:.88rem;line-height:1.5}
+.cd{margin-top:16px;text-align:center;font-size:.85rem;color:var(--mu)}
+.cdbar{height:3px;background:var(--bd);border-radius:3px;margin:8px 0;overflow:hidden}
+#cdb{display:block;height:100%;width:100%;background:var(--ac);transition:width 5s linear}
+.cdstop{background:none;border:0;color:var(--mu);text-decoration:underline;cursor:pointer;font-size:.8rem;padding:4px}
+.home #view{display:flex;align-items:center}
+.home header,.home #view{text-align:center}
+.home h1{font-size:1.9rem}
+.home #view .note{text-align:center!important}
+.home input{text-align:center}
+.home .chips{justify-content:center}
+.home #view,.home header{width:100%}
+.sum{margin-top:14px;font-size:.9rem;min-height:1.4em}
+.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bd);gap:12px}
+.row span:first-child{color:var(--mu)}.row b{text-align:right}
+.msg{margin-top:10px;font-size:.9rem;font-weight:500}
+.err{color:var(--er)}.ok{color:var(--ok)}
+.chips{display:flex;gap:6px;margin-top:8px}
+.chips button{flex:1;padding:9px 4px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);cursor:pointer}
+/* Struk */
+.tk{background:var(--card);border:1px solid var(--bd);border-radius:20px;overflow:hidden}
+.tk-h{background:var(--ac);color:var(--ac2);padding:22px 22px 24px}
+.tk-h small{opacity:.7;letter-spacing:.18em;font-size:.68rem}
+.tk-h h3{margin:6px 0 2px;font-size:1.6rem;letter-spacing:-.02em}
+.tk-h p{margin:0;opacity:.75;font-size:.9rem}
+.tk-b{padding:20px 22px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.meta small,.k{display:block;color:var(--mu);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.meta b{font-size:1rem}
+.seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.seats span{padding:4px 10px;border:1px solid var(--tx);border-radius:8px;font-weight:600;font-size:.85rem}
+.perf{position:relative;border-top:2px dashed var(--bd);margin:0}
+.perf:before,.perf:after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:1px solid var(--bd)}
+.perf:before{left:-11px}.perf:after{right:-11px}
+.pr{display:flex;justify-content:space-between;padding:5px 0;font-size:.92rem}
+.pr span:first-child{color:var(--mu)}
+.tot{border-top:1px solid var(--bd);margin-top:8px;padding-top:10px;font-size:1.1rem;font-weight:700}
+.tot span:first-child{color:var(--tx)}
+.stamp{display:inline-block;margin-top:12px;padding:4px 12px;border:2px solid var(--ok);color:var(--ok);border-radius:8px;font-weight:800;letter-spacing:.15em;transform:rotate(-4deg)}
+.bar{display:flex;justify-content:center;gap:2px;height:46px;margin:18px 0 6px}
+.bar i{display:block;background:var(--tx)}
+.code{text-align:center;font-family:ui-monospace,Menlo,monospace;letter-spacing:.25em;font-size:.8rem;color:var(--mu)}
+.note{text-align:center;color:var(--mu);font-size:.78rem;margin:14px 0 0}
+.pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:8px;animation:pl 1.2s ease-in-out infinite}@keyframes pl{50%{opacity:.2}}
+@media print{header,.steps,.noprint{display:none}body{background:#fff}html,body{height:auto;overflow:visible}.wrap{height:auto;display:block}#view{overflow:visible}#fit{zoom:1!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Tiket Bioskop</h1><p>Pesan tiket bioskop dengan mudah</p></header>
+<div id="view"><div id="fit"></div></div>
+<div id="foot" class="noprint"></div>
+</div>
+<script>
+let DB={films:[],shows:[],taken:{},sales:[],menu:[],paket:[],cfg:{ppn:[{m:0,r:0}],wk:0,ml:0,jm:"18:00"},promo:[],fsales:[],orders:[]};
+let ORK=null,REV=0,TK={admin:null,kasir:null},BUSY=false;
+try{ORK=sessionStorage.getItem("ordk")}catch(e){}
+try{Object.assign(TK,JSON.parse(sessionStorage.getItem("tk")||"{}"))}catch(e){}
+const saveTK=()=>{try{sessionStorage.setItem("tk",JSON.stringify(TK))}catch(e){}};
+const FILMS=DB.films;
+const PC={};
+/* ===== Komunikasi dengan server (Vercel + Neon) ===== */
+async function api(path,body){
+  const h={"Content-Type":"application/json"},t=TK[ROLE];
+  if(t)h.Authorization="Bearer "+t;
+  let r,j={};
+  try{r=await fetch(path,{method:body?"POST":"GET",headers:h,body:body?JSON.stringify(body):undefined,cache:"no-store"});j=await r.json()}
+  catch(e){return{ok:false,status:0,j:{error:"Tidak dapat terhubung ke server."}}}
+  if(r.status===401&&t&&path!=="/api/login")expired();
+  return{ok:r.ok&&j.ok!==false,status:r.status,j}
+}
+async function act(a,p){
+  if(BUSY)return{ok:false,busy:true,j:{error:"Sedang memproses, tunggu sebentar."}};
+  BUSY=true;
+  try{const r=await api("/api/act",{action:a,...p});if(r.j.state)sync(r.j.state);return r}
+  finally{BUSY=false}
+}
+const sa=async(a,p,hm)=>{const r=await act(a,p);if(r.busy)return r;AM=r.ok?"":esc(r.j.error||"Gagal menyimpan.");if(r.ok&&hm!==undefined)HM=hm;render();return r};
+function expired(){TK[ROLE]=null;saveTK();if(ROLE==="kasir")AUTHK=false;else if(ROLE==="admin")AUTH=false;AM="";REV=0;render()}
+function logout(){TK[ROLE]=null;saveTK();if(ROLE==="kasir")AUTHK=false;else AUTH=false;DB.sales=[];DB.fsales=[];DB.orders=[];DB.promo=[];setRole("pelanggan")}
+const METODE=[{n:"Tunai"},{n:"QRIS"},{n:"Transfer Bank"},{n:"E-Wallet"}];
+const JADWAL=["13:00","16:00","19:00"];
+const cln=s=>s.replace(/['"\\<>&`$]/g,"").trim();
+const paketAll=()=>[{n:"Tiket Saja",i:[]},...DB.paket];
+const pkt=n=>paketAll().find(x=>x.n===n)||{n,i:[]};
+const tixAt=(fi,j,t)=>{const d=new Date(t+"T00:00:00").getDay(),c=DB.cfg;const p=(d===0||d===6?c.wk:0)+(j>=c.jm?c.ml:0);return Math.round(FILMS[fi].h*(1+p/100)/500)*500};
+const tix=()=>tixAt(S.film,S.jadwal,S.tgl);
+const hrgP=(n,fi)=>tix()+pkt(n).i.reduce((t,x)=>t+((DB.menu.find(m=>m.n===x)||{}).h||0),0);
+const isi=n=>{const p=pkt(n);return p.i.length?["Tiket",...p.i].join(" + "):"Tiket masuk saja"};
+const MAX=10, BARIS="ABCDEFGH";
+const AUDI=[{n:"Audi 1"},{n:"Audi 2"},{n:"Audi 3"},{n:"Audi 4"},{n:"Audi 5"}];
+function hall(){const t=DB.taken[S.show+"|"+S.tgl]||[],a=[];for(const b of BARIS)for(let n=1;n<=12;n++)a.push({no:b+n,r:b,n,terisi:t.includes(b+n)});return a}
+const p2=n=>String(n).padStart(2,"0");
+const lk=t=>{const d=new Date(t);return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())};
+const addD=(t,n)=>{const d=new Date(t+"T00:00:00");d.setDate(d.getDate()+n);return lk(d.getTime())};
+const rp=n=>"Rp"+n.toLocaleString("id-ID");
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=id=>document.getElementById(id);
+let S,ROLE="pelanggan",AUTH=!!TK.admin,AUTHK=!!TK.kasir,AT="Kasir",AM="",RS=false,LP=0,HM="";
+function reset(){try{sessionStorage.removeItem("ordk")}catch(e){}const c=(S&&S.channel)||"Kasir";S={ost:"",channel:c,step:0,nama:"",film:null,audi:null,jadwal:null,kursi:[],tiket:null,metode:c==="Aplikasi"?"QRIS":"Tunai",bayar:0,pesan:"",err:false,kembali:0,kode:"",waktu:null,promo:"",tgl:lk(Date.now())}}
+reset();
+const go=n=>{S.step=n;S.pesan="";render()};
+const ppnRate=h=>{let r=0;[...DB.cfg.ppn].sort((a,b)=>a.m-b.m).forEach(t=>{if(h>=t.m)r=t.r});return r/100};
+const pct=x=>Math.round(x*100)+"%";
+const sub=()=>hrgP(S.tiket,S.film)*S.kursi.length;
+const rate=()=>ppnRate(hrgP(S.tiket,S.film));
+const promoF=c=>{c=(c||"").toUpperCase();const p=DB.promo.find(x=>x.c===c)||PC[c];return p&&p.on&&(p.h<0||new Date(S.tgl+"T00:00:00").getDay()===p.h)?p:null};
+const disc=()=>{const p=promoF(S.promo);if(!p)return 0;const b=sub();return Math.min(b,p.t==="p"?Math.round(b*p.v/100):p.v)};
+const ppn=()=>Math.round((sub()-disc())*rate());
+const total=()=>sub()-disc()+ppn();
+
+function kode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let k="";for(let i=0;i<8;i++)k+=c[Math.floor(Math.random()*c.length)];return k}
+function barcode(k){
+  let h=0,out="";
+  for(let i=0;i<48;i++){h=(h*31+k.charCodeAt(i%k.length)+i*7)>>>0;out+=`<i style="width:${1+h%3}px"></i>`}
+  return out;
+}
+
+const BLN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+let RP="Harian",RT=lk(Date.now());
+function setRT(v){if(!/^\d{4}-\d{2}-\d{2}$/.test(v||""))return;RT=v;render()}
+function setRP(p){RP=p;render()}
+function splitS(x){
+  const base=x.sb!==undefined?x.sb:x.amt;
+  const ad=pkt(x.tp).i.reduce((t,n)=>t+((DB.menu.find(m=>m.n===n)||{}).h||0),0)*x.q;
+  const fd=x.fd!==undefined?x.fd:Math.min(ad,base);
+  const tk=x.tk!==undefined?x.tk:base-fd;
+  return {tk,fd,px:x.px||0,tot:x.amt,it:x.it||pkt(x.tp).i};
+}
+function struk(d){
+  return `<div class="tk">
+      <div class="tk-h"><small>${d.ch==="Aplikasi"?"E-TIKET":"TIKET"} BIOSKOP</small><h3>${esc(d.f)}</h3><p>${esc(d.g)} · ${d.d} menit</p></div>
+      <div class="tk-b"><div class="meta">
+        <div><small>Tanggal tayang</small><b>${d.tgl}</b></div>
+        <div><small>Jam tayang</small><b>${d.j}</b></div>
+        <div><small>Audi</small><b>${d.a}</b></div>
+        <div><small>Paket</small><b>${esc(d.tp)}</b></div>
+        <div><small>Pemesan</small><b>${esc(d.n)}</b></div>
+        <div><small>Dibeli via</small><b>${esc(d.ch)}</b></div>
+      </div>
+      <div style="margin-top:16px"><small class="k">Kursi (${d.ks.length})</small><div class="seats">${d.ks.map(k=>`<span>${esc(k)}</span>`).join("")}</div></div>
+      <div style="margin-top:14px"><small class="k">Isi paket (per kursi)</small><b>${isi(d.tp)}</b></div></div>
+      <div class="perf"></div>
+      <div class="tk-b">
+        <div class="pr"><span>${d.q} × ${rp(d.hrg)}</span><span>${rp(d.sb)}</span></div>
+        ${d.ds?`<div class="pr"><span>Diskon${d.pk?" ("+esc(d.pk)+")":""}</span><span>-${rp(d.ds)}</span></div>`:""}
+        ${d.px!==undefined?`<div class="pr"><span>PPN (${pct(d.pr)})</span><span>${rp(d.px)}</span></div>`:""}
+        <div class="pr"><span>Metode bayar</span><span>${esc(d.m)}</span></div>
+        <div class="pr"><span>Dibayar customer</span><span>${rp(d.by)}</span></div>
+        <div class="pr"><span>Kembalian</span><span>${rp(d.kb)}</span></div>
+        <div class="pr tot"><span>Total</span><span>${rp(d.amt)}</span></div>
+        <div class="stamp"${d.rf?' style="border-color:var(--er);color:var(--er)"':""}>${d.rf?"REFUND":"LUNAS"}</div>
+        <div class="bar">${barcode(d.k)}</div><div class="code">${d.k}</div>
+        <p class="note">Tunjukkan kode ini di pintu studio. Selamat menonton!</p>
+      </div></div>`;
+}
+function strukLog(x){
+  const f=FILMS.find(y=>y.j===x.f)||{g:"-",d:dur(x.f)};
+  const tgl=new Date((x.td||lk(x.t))+"T00:00:00").toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const ks=x.ks?x.ks.split(", "):[];
+  return struk({ch:x.ch||"Kasir",f:x.f,g:f.g,d:f.d,tgl,j:x.j,a:AUDI[x.a].n,tp:x.tp,n:x.n||"-",ks,hrg:Math.round((x.sb!==undefined?x.sb:x.amt)/x.q),q:x.q,sb:x.sb!==undefined?x.sb:x.amt,px:x.px,pr:x.pr,m:x.m,by:x.by!==undefined?x.by:x.amt,kb:x.kb||0,amt:x.amt,k:x.k,rf:x.rf,ds:x.ds,pk:x.pk});
+}
+function viewStruk(i){RV=i;HM="";render()}
+function closeStruk(){RV=null;render()}
+function fit(){
+  const b=$("view"),f=$("fit");f.style.zoom=1;
+  const a=b.clientHeight,n=f.offsetHeight;
+  if(n>a)f.style.zoom=Math.max(stf()?.75:.5,a/n);
+}
+addEventListener("resize",()=>fit());
+function render(){render0();fit()}
+function render0(){
+  document.body.classList.toggle("home",ROLE==="pelanggan"&&S.step===0);
+  document.body.classList.toggle("adm",stf());
+  if(S.step!==6||stf()){if(CD){clearInterval(CD);CD=null}CDOFF=false}
+  document.querySelector("h1").textContent=ROLE==="admin"?"Panel Admin":ROLE==="kasir"?"Panel Kasir":"Tiket Bioskop";
+  document.querySelector("header p").style.display=stf()?"none":"";
+  $("foot").innerHTML=ROLE==="pelanggan"&&S.step===0?`<div style="text-align:center;margin-top:34px"><button class="stf" style="display:inline;margin:0;padding:0;font:inherit;font-size:.75rem" onclick="setRole('kasir')">Tiket</button> <button class="stf" style="display:inline;margin:0;padding:0;font:inherit;font-size:.75rem" onclick="setRole('admin')">Bioskop</button></div>`:"";
+  if(stf()){document.querySelector(".wrap").style.maxWidth="640px";return renderAdmin()}
+  document.querySelector(".wrap").style.maxWidth=S.step===3?"720px":"";
+  const v=$("fit");
+  const back=`<button class="btn ghost" onclick="go(${S.step-1})">← Kembali</button>`;
+  if(S.step===0){
+    v.innerHTML=`<h2>Beli melalui</h2>
+    <div class="chips big">${["Kasir","Aplikasi"].map(c=>`<button class="${S.channel===c?"on":""}" onclick="setChannel('${c}')">${c}</button>`).join("")}</div>
+    <p class="note" style="text-align:left;margin:8px 0 0">${S.channel==="Kasir"?"Pembelian langsung di loket. Bisa bayar tunai, QRIS, transfer, atau e-wallet.":"Pembelian online lewat aplikasi. Pembayaran non-tunai."}</p>
+    <h2 style="margin-top:22px">Data pelanggan</h2><label for="nama">Nama pelanggan</label>
+    <input type="text" id="nama" placeholder="Masukkan nama" value="${esc(S.nama)}" autocomplete="name">
+    <div class="msg err" id="m"></div><button class="btn" onclick="setNama()">Lanjut</button>`;
+    $("nama").addEventListener("keydown",e=>{if(e.key==="Enter")setNama()});
+  }else if(S.step===1){
+    v.innerHTML=`<h2>Pilih film</h2>`+FILMS.map((f,i)=>!DB.shows.some(x=>x.f===f.j)?"":`<button class="opt ${S.film===i?"sel":""}" onclick="S.film=${i};S.show=null;go(2)"><span><b>${f.j}</b><br><small>${f.g} · ${f.d} menit · ${rp(f.h)}</small></span><span>›</span></button>`).join("")+back;
+  }else if(S.step===2){
+    const sh=DB.shows.filter(x=>x.f===FILMS[S.film].j).sort((a,b)=>a.j<b.j?-1:1),td=lk(Date.now()),nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();
+    v.innerHTML=`<h2>Pilih tanggal & jam · ${esc(FILMS[S.film].j)}</h2><label for="tg">Tanggal tayang</label><input type="date" id="tg" value="${S.tgl}" min="${td}" max="${addD(td,30)}" onchange="setTgl(this.value)"><p class="note" style="text-align:left;margin:8px 0 14px">Film ini ditayangkan di <b>${AUDI[FILMS[S.film].a].n}</b></p>`+sh.map(x=>{const old=S.tgl===td&&mn(x.j)<=nm;return `<button class="opt ${S.show===x.id?"sel":""}" ${old?'disabled style="opacity:.4;cursor:not-allowed"':""} onclick="S.show=${x.id};S.audi=${x.a};S.jadwal='${x.j}';S.kursi=[];go(3)"><span><b>${x.j}</b><br><small>${old?"Sudah lewat":"Tiket "+rp(tixAt(S.film,x.j,S.tgl))}</small></span><span>›</span></button>`}).join("")+back;
+  }else if(S.step===3){
+    let h=`<h2>Pilih kursi · ${AUDI[S.audi].n} · ${S.tgl.split("-").reverse().join("/")} ${S.jadwal}</h2><div class="screen">LAYAR</div><div class="hs"><div class="hall">`;
+    for(const r of BARIS){
+      h+=`<div class="rl">${r}</div>`;
+      for(const k of hall().filter(x=>x.r===r)){
+        const sel=S.kursi.includes(k.no);
+        h+=`<button class="seat ${k.terisi?"taken":""} ${sel?"sel":""}" ${k.terisi?"disabled":""} aria-label="Kursi ${k.no}${k.terisi?" (sudah dipesan)":""}" onclick="toggle('${k.no}')">${k.terisi?"✕":k.n}</button>`;
+        if(k.n===4||k.n===8)h+=`<i></i>`;
+      }
+    }
+    h+=`</div></div><div class="legend"><span><i class="sw"></i>Tersedia</span><span><i class="sw s1"></i>Dipilih</span><span><i class="sw s2"></i>Sudah dipesan</span></div>
+    <div class="sum ${S.err?"err":""}">${S.pesan||(S.kursi.length?"Dipilih: <b>"+S.kursi.join(", ")+"</b>":"Ketuk kursi untuk memilih (maks. "+MAX+")")}</div>
+    <button class="btn" ${S.kursi.length?"":"disabled"} onclick="go(4)">Lanjut${S.kursi.length?" · "+S.kursi.length+" kursi":""}</button>${back}`;
+    v.innerHTML=h;
+  }else if(S.step===4){
+    v.innerHTML=`<h2>Tiket & paket bundling</h2>${tix()>FILMS[S.film].h?`<p class="note" style="text-align:left;margin:-6px 0 14px">Harga tiket sudah termasuk tarif akhir pekan/jam malam.</p>`:""}`+paketAll().map(p=>{const n=p.n,h=hrgP(n,S.film);return `<button class="opt ${S.tiket===n?"sel":""}" onclick="S.tiket='${n}';S.bayar=0;go(5)"><span><b>${n}</b><br><small>${isi(n)}</small></span><span style="text-align:right">${rp(h)} / kursi<br><small>+ PPN ${pct(ppnRate(h))}</small></span></button>`}).join("")+back;
+  }else if(S.step===5){
+    const tot=total();
+    v.innerHTML=`<h2>Ringkasan pesanan</h2>
+    <div class="row"><span>Film</span><b>${FILMS[S.film].j}</b></div>
+    <div class="row"><span>Dibeli via</span><b>${S.channel}</b></div>
+    <div class="row"><span>Audi</span><b>${AUDI[S.audi].n}</b></div>
+    <div class="row"><span>Jadwal</span><b>${S.tgl.split("-").reverse().join("/")} · ${S.jadwal}</b></div>
+    <div class="row"><span>Kursi</span><b>${S.kursi.join(", ")}</b></div>
+    <div class="row"><span>Paket</span><b>${S.tiket} × ${S.kursi.length}</b></div>
+    <div class="row"><span>Isi paket</span><b>${isi(S.tiket)}</b></div>
+    <div class="row"><span>Subtotal</span><b>${rp(sub())}</b></div>
+    ${disc()?`<div class="row"><span>Diskon (${esc(S.promo)})</span><b>-${rp(disc())}</b></div>`:""}
+    <div class="row"><span>PPN (${pct(rate())})</span><b>${rp(ppn())}</b></div>
+    <div class="row"><span>Total harga</span><b>${rp(tot)}</b></div>
+    ${`<label style="margin-top:16px">Kode promo (opsional)</label><div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input type="text" id="pc" placeholder="Contoh: PELAJAR" value="${esc(S.promo)}" style="text-transform:uppercase"><button class="btn" style="margin:0;width:auto;padding:0 18px" onclick="setPromo()">Pakai</button></div>${S.promo?(promoF(S.promo)?`<small class="k ok" style="margin-top:6px">Promo ${esc(S.promo)} terpasang</small>`:`<small class="k err" style="margin-top:6px">Kode tidak berlaku untuk tanggal tayang ini</small>`):""}`}
+    <label style="margin-top:16px">Metode pembayaran</label>
+    <div class="chips pm noprint">${METODE.filter(m=>S.channel==="Kasir"||m.n!=="Tunai").map(m=>`<button class="${S.metode===m.n?"on":""}" onclick="S.metode='${m.n}';S.pesan='';render()">${m.n}</button>`).join("")}</div>
+    ${S.metode==="Tunai"?`<p class="note" style="text-align:left">Bayar tunai di kasir setelah pesanan dibuat. Sebutkan kode pesanan ke kasir.</p>`:`<div class="pay-info">${info()}</div>`}
+    <div class="msg ${S.err?"err":"ok"}">${S.pesan}</div>
+    <button class="btn" onclick="pesan()">Buat pesanan</button>${back}`;
+  }else{renderWait(v)}
+}
+function setChannel(c){
+  const n=$("nama");if(n)S.nama=n.value;
+  S.channel=c;S.metode=c==="Aplikasi"?"QRIS":"Tunai";render();
+}
+function setNama(){
+  const n=$("nama").value.trim();
+  if(!n){$("m").textContent="Nama tidak boleh kosong!";return}
+  S.nama=n;go(1);
+}
+function toggle(no){
+  const i=S.kursi.indexOf(no);
+  S.pesan="";S.err=false;
+  if(i>=0)S.kursi.splice(i,1);
+  else if(S.kursi.length>=MAX){S.pesan="Maksimal "+MAX+" kursi per pemesanan.";S.err=true}
+  else{S.kursi.push(no);S.kursi.sort((a,b)=>a[0]===b[0]?a.slice(1)-b.slice(1):a<b?-1:1)}
+  render();
+}
+function payInfo(m,sisa){
+  if(m==="QRIS"){let h=4660,c="";for(let i=0;i<121;i++){h=(h*1103515245+12345)>>>0;c+=`<i class="${(h>>16)&1?"b":""}"></i>`}
+    return `<div class="qr">${c}</div><p>Scan QRIS untuk membayar <b>${rp(sisa)}</b></p><small class="k">Simulasi demo</small>`}
+  if(m==="Transfer Bank")return `<div class="row"><span>Bank</span><b>BCA (demo)</b></div><div class="row"><span>No. virtual account</span><b>8077 0812 3456</b></div><p>Transfer tepat <b>${rp(sisa)}</b>, lalu tunggu konfirmasi kasir.</p>`;
+  return `<div class="row"><span>E-Wallet</span><b>GoPay / OVO / DANA</b></div><div class="row"><span>Nomor tujuan (demo)</span><b>0812 3456 7890</b></div><p>Kirim tepat <b>${rp(sisa)}</b>, lalu tunggu konfirmasi kasir.</p>`;
+}
+function info(){return payInfo(S.metode,total())}
+const TTL=15*60000,KM={},CU={};
+let CX="",CC=false,DIRTY=false;
+const ord=k=>DB.orders.find(x=>x.k===k);
+const antri=()=>DB.orders.filter(o=>o.st==="menunggu").sort((a,b)=>(a.qs||a.t)-(b.qs||b.t));
+const posn=o=>antri().findIndex(x=>x.k===o.k)+1;
+const sk=o=>o?o.st+"|"+(o.st==="menunggu"?posn(o):0):"";
+async function tunda(k){const r=await act("order_defer",{k});if(r.ok)HM="Pesanan "+k+" ditunda ke antrian paling belakang.";render()}
+const jam=t=>new Date(t).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+function sync(x){
+  if(!x||!x.films)return;
+  for(const k in x){if(k==="films"){FILMS.length=0;x.films.forEach(f=>FILMS.push(f))}else if(k==="rev")REV=x.rev;else if(k!=="ok"&&k!=="unchanged")DB[k]=x[k]}
+}
+async function pesan(){
+  const r=await act("order_create",{nama:S.nama,channel:S.channel,showId:S.show,tgl:S.tgl,tiket:S.tiket,kursi:S.kursi,promo:S.promo,metode:S.metode});
+  if(r.busy)return;
+  if(!r.ok){
+    if(r.j.taken){S.kursi=S.kursi.filter(k=>!r.j.taken.includes(k));S.step=3}
+    S.pesan=esc(r.j.error||"Gagal membuat pesanan.");S.err=true;return render();
+  }
+  S.kode=r.j.k;try{sessionStorage.setItem("ordk",S.kode)}catch(e){}
+  S.ost="menunggu";S.step=6;S.pesan="";S.err=false;CC=false;render();
+}
+async function batalSaya(){
+  if(!CC){CC=true;return render()}
+  await act("order_cancel",{k:S.kode});CC=false;render();
+}
+function renderWait(v){
+  const o=ord(S.kode);S.ost=sk(o);
+  const again=`<button class="btn noprint" onclick="reset();render()">Pesan tiket lagi</button>`;
+  if(!o){v.innerHTML=`<h2>Pesanan tidak ditemukan</h2><p class="note" style="text-align:left">Data pesanan sudah tidak ada di sistem.</p>`+again;return}
+  if(o.st==="menunggu"){
+    v.innerHTML=`<h2><span class="pulse"></span>Menunggu konfirmasi pembayaran</h2>
+    <div class="acard" style="text-align:center"><small class="k">Kode pesanan</small><div class="big2" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:.2em">${o.k}</div><small class="lgs">Sebutkan kode ini ke kasir</small></div>
+    <div class="row"><span>Nomor antrian</span><b>${posn(o)===1?"Giliran Anda, kasir sedang memproses":"Antrian ke-"+posn(o)+" ("+(posn(o)-1)+" pesanan di depan)"}</b></div>
+    <div class="row"><span>Pemesan</span><b>${esc(o.n)}</b></div>
+    <div class="row"><span>Film</span><b>${esc(o.f)}</b></div>
+    <div class="row"><span>Jadwal</span><b>${o.td.split("-").reverse().join("/")} · ${o.j} · ${AUDI[o.a].n}</b></div>
+    <div class="row"><span>Kursi</span><b>${esc(o.ks)}</b></div>
+    <div class="row"><span>Metode</span><b>${esc(o.m)}</b></div>
+    <div class="row"><span>Total</span><b>${rp(o.amt)}</b></div>
+    <div class="pay-info">${o.m==="Tunai"?`<p>Bayar tunai di kasir sebesar <b>${rp(o.amt)}</b>.</p>`:payInfo(o.m,o.amt)}</div>
+    <p class="note">Tiket muncul otomatis setelah kasir mengonfirmasi pembayaran. Pesanan hangus pukul ${jam(o.t+TTL)} jika belum dibayar.</p>
+    ${CC?`<div class="msg err">Batalkan pesanan ini? Kursi akan dilepas.</div><div style="display:flex;gap:8px"><button class="btn" style="background:var(--er);color:#fff" onclick="batalSaya()">Ya, batalkan</button><button class="btn ghost" onclick="CC=false;render()">Tidak</button></div>`:`<button class="btn ghost" onclick="batalSaya()">Batalkan pesanan</button>`}`;
+    return;
+  }
+  if(o.st==="batal"){
+    const w=o.why==="kedaluwarsa"?"Pembayaran tidak dikonfirmasi dalam 15 menit, jadi pesanan hangus.":o.why==="staf"?"Pesanan dibatalkan oleh kasir.":"Anda membatalkan pesanan ini.";
+    v.innerHTML=`<h2>Pesanan ${o.why==="kedaluwarsa"?"kedaluwarsa":"dibatalkan"}</h2><p class="note" style="text-align:left">${w} Kursi sudah dilepas dan tidak ada tagihan.</p>`+again;return;
+  }
+  const x=DB.sales.find(z=>z.k===o.k);
+  if(!x){v.innerHTML=`<h2>Pembayaran dikonfirmasi</h2><p class="note" style="text-align:left">Data tiket tidak ditemukan. Tunjukkan kode <b>${o.k}</b> ke kasir.</p>`+again;return}
+  const kiosk=S.channel==="Kasir";
+  v.innerHTML=strukLog(x)+(kiosk?`<div class="cd noprint"><span id="cdt">Kembali ke awal dalam 5 detik</span><div class="cdbar"><i id="cdb"></i></div><button class="cdstop" id="cdx" onclick="stopCD()">Tahan tiket</button></div>`:"")+again+`<button class="btn ghost noprint" onclick="window.print()">Cetak tiket</button>`;
+  if(kiosk)startCD();
+}
+function kbUp(k,v){const o=ord(k),e=$("kb-"+k);if(!o||!e)return;const b=parseInt(v,10);e.textContent=b>=o.amt?"Kembalian "+rp(b-o.amt):b>0?"Kurang "+rp(o.amt-b):""}
+async function konfirmasi(k,cetak){
+  const o=ord(k),m=KM[k]||(o&&o.m),uang=m==="Tunai"?parseInt(CU[k],10):null;
+  const r=await act("order_confirm",{k,metode:m,uang});
+  if(r.busy)return;
+  if(!r.ok){AM=esc(r.j.error||"Gagal melunasi pesanan.");return render()}
+  AM="";CX="";delete CU[k];delete KM[k];
+  const kb=r.j.kb;
+  HM="Pesanan "+k+" lunas ("+r.j.m+")"+(kb>0?" · kembalian "+rp(kb):"")+(cetak?"":". Tekan Cetak struk.");
+  const i=DB.sales.findIndex(z=>z.k===k);RV=i>=0?i:null;render();
+  if(cetak)setTimeout(()=>window.print(),300);
+}
+async function batalOrder(k){
+  if(CX!==k){CX=k;return render()}
+  CX="";const r=await act("order_cancel",{k});
+  if(r.ok)HM="Pesanan "+k+" dibatalkan. Kursi tersedia lagi.";
+  render();
+}
+function kasirUI(){
+  const P=antri();
+  const dn=DB.orders.filter(o=>o.st==="lunas").sort((a,b)=>b.pt-a.pt).slice(0,5);
+  let h=`<h2>Antrian pembayaran (${P.length})</h2>`+(P.length?P.map((o,ix)=>{
+    if(ix)return `<div class="acard" style="opacity:.8"><div class="row" style="border:0;padding:0"><span style="color:var(--tx)"><b>Antrian ${ix+1} · ${esc(o.n)}</b><br><small class="lgs">${o.k} · ${esc(o.f)} · ${o.j} · kursi ${esc(o.ks)}</small></span><b>${rp(o.amt)}</b></div></div>`;
+    const m=KM[o.k]||o.m,b0=parseInt(CU[o.k],10);
+    return `<div class="acard"><small class="k ok">Sedang dilayani · antrian 1</small><div class="row" style="border:0;padding:0"><b>${esc(o.n)}</b><b>${rp(o.amt)}</b></div>
+    <div class="lgs">Kode: <b style="color:var(--tx);letter-spacing:.15em">${o.k}</b> · via ${esc(o.ch)} · pilih ${esc(o.m)}</div>
+    <div class="lgs">${esc(o.f)} · ${AUDI[o.a].n} · ${o.td} ${o.j}</div>
+    <div class="lgs">Kursi ${esc(o.ks)} · ${esc(o.tp)} × ${o.q}</div>
+    <div class="lgs">Subtotal ${rp(o.sb)}${o.ds?" · diskon -"+rp(o.ds):""} · PPN ${rp(o.px)}</div>
+    <div class="lgs">Dipesan ${jam(o.t)} · hangus ${jam(o.t+TTL)}</div>
+    <label style="margin:10px 0 0">Pembayaran diterima via</label>
+    <div class="chips pm">${METODE.map(x=>`<button class="${m===x.n?"on":""}" onclick="KM['${o.k}']='${x.n}';render()">${x.n}</button>`).join("")}</div>
+    ${m==="Tunai"?`<input type="number" inputmode="numeric" min="1" placeholder="Uang diterima (Rp)" value="${CU[o.k]||""}" oninput="CU['${o.k}']=this.value;kbUp('${o.k}',this.value)" style="margin-top:8px;padding:10px 12px;font-size:.95rem"><div class="chips"><button onclick="CU['${o.k}']=${o.amt};render()">Pas</button><button onclick="CU['${o.k}']=50000;render()">50rb</button><button onclick="CU['${o.k}']=100000;render()">100rb</button><button onclick="CU['${o.k}']=200000;render()">200rb</button></div><small class="k" id="kb-${o.k}" style="margin-top:6px">${b0>=o.amt?"Kembalian "+rp(b0-o.amt):b0>0?"Kurang "+rp(o.amt-b0):""}</small>`:`<p class="lgs">Pastikan ${esc(m)} sebesar <b>${rp(o.amt)}</b> sudah masuk, lalu lunasi.</p>`}
+    <div style="display:flex;gap:8px"><button class="btn" style="margin-top:10px" onclick="konfirmasi('${o.k}',false)">Lunasi</button><button class="btn" style="margin-top:10px" onclick="konfirmasi('${o.k}',true)">Lunasi & cetak</button></div>
+    ${CX===o.k?`<div class="lgs" style="margin-top:8px">Batalkan pesanan ${o.k}? Kursi akan dilepas.</div><div style="display:flex;gap:8px"><button class="btn" style="margin:6px 0 0;padding:10px;background:var(--er);color:#fff" onclick="batalOrder('${o.k}')">Ya, batalkan</button><button class="btn ghost" style="margin:6px 0 0;padding:10px" onclick="CX='';render()">Tidak</button></div>`:`<button class="del" style="margin-top:8px" onclick="batalOrder('${o.k}')">Batalkan pesanan</button>${P.length>1?`<button class="del" style="margin:8px 0 0 14px;color:var(--tx)" onclick="tunda('${o.k}')">Tunda ke belakang</button>`:""}`}</div>`}).join(""):`<p class="note" style="text-align:left">Belum ada pesanan yang menunggu. Daftar ini diperbarui otomatis.</p>`);
+  if(dn.length)h+=`<h2 style="margin-top:24px">Baru dilunasi</h2><div class="acard">`+dn.map(o=>{const i=DB.sales.findIndex(z=>z.k===o.k);return `<div class="row" style="align-items:center"><span style="color:var(--tx)"><b>${esc(o.n)}</b><br><small class="lgs">${o.k} · ${rp(o.amt)}</small></span>${i>=0?`<button class="del" style="color:var(--tx);text-decoration:underline" onclick="viewStruk(${i})">Cetak struk</button>`:""}</div>`}).join("")+`</div>`;
+  return h;
+}
+async function poll(force){
+  if(!force&&document.hidden)return;
+  const st=stf();
+  if(st&&!(ROLE==="kasir"?AUTHK:AUTH))return;
+  if(!force&&!st&&S.step===0)return;
+  const k=st?"":(S.step===6?S.kode:ORK);
+  const r=await api("/api/state?rev="+REV+(k?"&k="+encodeURIComponent(k):""));
+  if(!r.ok||r.j.unchanged)return;
+  sync(r.j);DIRTY=true;
+  const ae=document.activeElement,typing=ae&&(ae.tagName==="INPUT"||ae.tagName==="SELECT");
+  if(stf()){if((ROLE==="kasir"?AUTHK:AUTH)&&(ROLE==="kasir"||AT==="Kasir")&&RV===null){if(!typing){DIRTY=false;render()}}else DIRTY=false}
+  else{DIRTY=false;if(S.step===6){const o=ord(S.kode);if(sk(o)!==S.ost)render()}else if(S.step===3){const t=DB.taken[S.show+"|"+S.tgl]||[];S.kursi=S.kursi.filter(z=>!t.includes(z));render()}}
+}
+const mn=t=>+t.slice(0,2)*60+ +t.slice(3);
+const dur=n=>(FILMS.find(f=>f.j===n)||{d:120}).d;
+let CD=null,CDN=5,CDOFF=false,RV=null;
+function stopCD(){
+  if(CD)clearInterval(CD);CD=null;CDOFF=true;
+  const t=$("cdt"),b=$("cdb"),x=$("cdx");
+  if(t)t.textContent="Hitung mundur dihentikan";
+  if(b){b.style.transition="none";b.style.width="0"}
+  if(x)x.remove();
+}
+function startCD(){
+  if(CD)return;
+  if(CDOFF){stopCD();return}
+  CDN=5;
+  const b=$("cdb");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(b)b.style.width="0"}));
+  CD=setInterval(()=>{
+    CDN--;
+    if(CDN<=0){clearInterval(CD);CD=null;reset();render()}
+    else $("cdt").textContent="Kembali ke awal dalam "+CDN+" detik";
+  },1000);
+}
+function stf(){return ROLE==="admin"||ROLE==="kasir"}
+function setRole(r){ROLE=r;REV=0;AM="";RV=null;if(r==="pelanggan"){reset();if(location.hash)location.hash=""}render()}
+async function login(){
+  const k=ROLE==="kasir",role=ROLE,pin=$("pin").value;
+  const r=await api("/api/login",{role,pin});
+  if(r.ok&&r.j.token){TK[role]=r.j.token;saveTK();if(k)AUTHK=true;else AUTH=true;AM="";REV=0;await poll(true);render()}
+  else{const m=$("m");if(m)m.textContent=r.j.error||"PIN salah."}
+}
+function setFilmAudi(i,v){sa("film_audi",{film:FILMS[i].j,audi:+v})}
+function addFilm(){
+  const j=$("fj").value.trim(),g=$("fg").value.trim(),d=parseInt($("fd").value,10),hp=parseInt($("fp").value,10);
+  if(!j||!g||!(d>0)||!(hp>0)){AM="Lengkapi judul, genre, durasi, dan harga tiket film.";return render()}
+  sa("film_add",{j,g,d,h:hp,a:+$("fa").value})
+}
+function delFilm(i){sa("film_del",{film:FILMS[i].j})}
+function addShow(){
+  const f=$("sf").value,j=$("sj").value;
+  if(!f||!j){AM="Pilih film dan jam tayang.";return render()}
+  sa("show_add",{film:f,jam:j})
+}
+function delShow(id){sa("show_del",{id})}
+function setFilmHarga(i,v){
+  v=parseInt(v,10);
+  if(!(v>0)){AM="Harga tiket harus lebih dari 0.";return render()}
+  sa("film_harga",{film:FILMS[i].j,h:v})
+}
+function setMenuHarga(i,v){
+  v=parseInt(v,10);
+  if(!(v>=0)){AM="Harga tidak valid.";return render()}
+  sa("menu_harga",{n:DB.menu[i].n,h:v})
+}
+function addMenu(){
+  const n=cln($("mn").value),h=parseInt($("mh").value,10);
+  if(!n||!(h>=0)){AM="Isi nama item dan harga.";return render()}
+  sa("menu_add",{n,h})
+}
+function delMenu(i){sa("menu_del",{n:DB.menu[i].n})}
+function togglePI(pi,mi){sa("paket_toggle",{paket:DB.paket[pi].n,item:DB.menu[mi].n})}
+function addPaket(){
+  const n=cln($("pn").value);
+  if(!n){AM="Isi nama paket.";return render()}
+  sa("paket_add",{n})
+}
+function delPaket(pi){sa("paket_del",{n:DB.paket[pi].n})}
+async function resetSales(){if(!RS){RS=true;return render()}RS=false;await sa("reset_sales",{})}
+const HARI=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+let RF=-1,FQ={},FM="Tunai";
+function setTgl(v){const t=lk(Date.now());if(/^\d{4}-\d{2}-\d{2}$/.test(v||"")&&v>=t&&v<=addD(t,30)){S.tgl=v;S.show=null;S.kursi=[]}render()}
+async function setPromo(){
+  S.promo=cln($("pc").value).toUpperCase();S.pesan="";
+  if(S.promo){const r=await act("promo_check",{code:S.promo});PC[S.promo]=r.ok?r.j.promo:null}
+  render();
+}
+function askRefund(i){RF=RF===i?-1:i;render()}
+async function doRefund(i){
+  const x=DB.sales[i];if(!x||x.rf)return;
+  const r=await act("refund",{k:x.k});RF=-1;
+  if(r.busy)return;
+  if(r.ok)HM="Refund "+rp(x.amt)+" untuk kode "+x.k+" berhasil. Kursi "+x.ks+" tersedia lagi.";else AM=esc(r.j.error||"Refund gagal.");
+  render();
+}
+const rfUI=i=>RF===i?`<div class="lgs" style="margin-top:8px">Batalkan tiket dan kembalikan ${rp(DB.sales[i].amt)}? Kursi akan tersedia lagi.<div style="display:flex;gap:8px"><button class="btn" style="margin:6px 0 0;padding:10px;background:var(--er);color:#fff" onclick="doRefund(${i})">Ya, refund</button><button class="btn ghost" style="margin:6px 0 0;padding:10px" onclick="askRefund(${i})">Batal</button></div></div>`:`<button class="del" style="margin-top:6px" onclick="askRefund(${i})">Batalkan & refund</button>`;
+function setPpn(i,f,v){
+  v=parseFloat(v);if(!(v>=0)||(f==="r"&&v>100)||(f==="m"&&i>0&&v<=0)){AM="Nilai tidak valid.";return render()}
+  const t=DB.cfg.ppn.map(x=>({m:x.m,r:x.r}));t[i][f]=v;t.sort((a,b)=>a.m-b.m);sa("ppn_save",{tiers:t})
+}
+function addPpn(){const t=DB.cfg.ppn.map(x=>({m:x.m,r:x.r})),e=t[t.length-1];t.push({m:e.m+25000,r:e.r});sa("ppn_save",{tiers:t})}
+function delPpn(i){sa("ppn_save",{tiers:DB.cfg.ppn.filter((_,k)=>k!==i)})}
+function setCfg(f,v){
+  if(f==="jm"){if(!/^\d{2}:\d{2}$/.test(v))return render()}
+  else{v=parseFloat(v);if(!(v>=0&&v<=200)){AM="Persentase harus 0 sampai 200.";return render()}}
+  sa("cfg_set",{f,v})
+}
+function addPromo(){
+  const c=cln($("pcd").value).toUpperCase().replace(/\s+/g,""),t=$("pt").value,v=parseFloat($("pv").value),h=+$("ph").value;
+  if(!c||!(v>0)||(t==="p"&&v>100)){AM="Isi kode dan nilai diskon yang valid (persen maksimal 100).";return render()}
+  sa("promo_add",{c,t,v,h})
+}
+function togPromo(i){sa("promo_toggle",{c:DB.promo[i].c})}
+function delPromo(i){sa("promo_del",{c:DB.promo[i].c})}
+function setFQ(i,v){v=parseInt(v,10);FQ[DB.menu[i].n]=v>0?v:0;render()}
+function foodUI(){
+  const q=n=>FQ[n]||0,sb=DB.menu.reduce((t,m)=>t+m.h*q(m.n),0),n=DB.menu.reduce((t,m)=>t+q(m.n),0),r=n?ppnRate(sb/n):0,px=Math.round(sb*r);
+  return `<h2 style="margin-top:28px">Jual makanan tanpa tiket (konter)</h2>`+DB.menu.map((m,i)=>`<div class="row" style="align-items:center"><span style="color:var(--tx)">${esc(m.n)}<br><small class="lgs">${rp(m.h)}</small></span><input type="number" min="0" step="1" value="${q(m.n)}" style="width:80px;padding:8px 10px;text-align:right;font-size:.9rem" onchange="setFQ(${i},this.value)"></div>`).join("")+
+  `<div class="row"><span>Subtotal</span><b>${rp(sb)}</b></div><div class="row"><span>PPN${n?" ("+pct(r)+")":""}</span><b>${rp(px)}</b></div><div class="row"><span>Total</span><b>${rp(sb+px)}</b></div>
+  <div class="fr" style="margin-top:12px"><input type="text" id="fn" placeholder="Nama pembeli (opsional)"></div>
+  <div class="chips pm">${METODE.map(m=>`<button class="${FM===m.n?"on":""}" onclick="FM='${m.n}';render()">${m.n}</button>`).join("")}</div>
+  ${FM==="Tunai"?`<input type="number" id="fu" inputmode="numeric" min="1" placeholder="Uang dibayar (Rp)" style="margin-top:10px">`:""}
+  <button class="btn" ${n?"":"disabled"} onclick="sellFood()">Jual</button>`;
+}
+async function sellFood(){
+  const it=DB.menu.filter(m=>FQ[m.n]>0).map(m=>({n:m.n,q:FQ[m.n]}));
+  if(!it.length){AM="Pilih minimal satu item.";return render()}
+  const nm=$("fn").value,uang=FM==="Tunai"?parseInt($("fu").value,10):null;
+  const r=await act("food_sell",{items:it,nama:nm,metode:FM,uang});
+  if(r.busy)return;
+  if(r.ok){FQ={};AM="";HM="Penjualan makanan "+r.j.k+" berhasil: "+rp(r.j.amt)+(FM==="Tunai"?" · kembalian "+rp(r.j.kb):"")}else AM=esc(r.j.error||"Gagal.");
+  render();
+}
+function repRecs(){
+  const pre=RP==="Harian"?RT:RP==="Bulanan"?RT.slice(0,7):RT.slice(0,4);
+  return [...DB.sales.map((x,i)=>({x,i,fs:false})),...DB.fsales.map((x,i)=>({x,i,fs:true}))].map(o=>({...o,key:lk(o.x.t)})).filter(o=>o.key.startsWith(pre)).sort((a,b)=>a.x.t-b.x.t);
+}
+function exportCSV(){
+  const q=v=>{v=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};
+  const W=t=>t?new Date(t).toLocaleString("id-ID"):"";
+  const H=["Kode","Waktu transaksi","Tanggal tayang","Jam tayang","Film","Audi","Kursi","Jumlah tiket","Paket","Pemesan","Kanal","Metode bayar","Subtotal","Kode promo","Diskon","PPN","Total","Status","Waktu refund"];
+  const R=repRecs().map(({x,fs})=>fs?[x.k,W(x.t),"","","Penjualan makanan konter","","",0,x.it.map(i=>i.n+" x"+i.q).join(", "),x.n,"Konter",x.m,x.sb,"",0,x.px,x.amt,"Lunas",""]:[x.k,W(x.t),x.td||lk(x.t),x.j,x.f,AUDI[x.a].n,x.ks,x.q,x.tp,x.n||"",x.ch||"Kasir",x.m,x.sb!==undefined?x.sb:x.amt,x.pk||"",x.ds||0,x.px||0,x.amt,x.rf?"Refund":"Lunas",x.rf?W(x.rt):""]);
+  if(!R.length){AM="Tidak ada data pada periode ini.";return render()}
+  const csv="\uFEFF"+[H,...R].map(r=>r.map(q).join(";")).join("\r\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download="laporan-"+RP.toLowerCase()+"-"+RT+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+const colChart=a=>{const mx=Math.max(1,...a.map(z=>z[1]));return `<div style="display:flex;align-items:flex-end;gap:2px;height:110px">${a.map(z=>`<div title="${esc(String(z[0]))}: ${rp(z[1])}" style="flex:1;background:var(--ac);border-radius:3px 3px 0 0;height:${Math.max(z[1]?3:1,z[1]/mx*100)}%;opacity:${z[1]?1:.15}"></div>`).join("")}</div><div style="display:flex;gap:2px;font-size:.58rem;color:var(--mu);margin-top:4px">${a.map((z,i)=>`<span style="flex:1;text-align:center;overflow:hidden">${a.length>16&&i%2?"":esc(String(z[0]))}</span>`).join("")}</div><small class="lgs">Tertinggi ${rp(mx>1?mx:0)}</small>`};
+const barChart=(a,u)=>{const mx=Math.max(1,...a.map(z=>z[1]));return a.length?a.map(z=>`<div class="row" style="align-items:center;padding:7px 0"><span style="width:96px;flex:none;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(String(z[0]))}</span><div style="flex:1;background:var(--seat);border-radius:4px;height:10px"><div style="width:${z[1]/mx*100}%;height:100%;background:var(--ac);border-radius:4px"></div></div><b style="min-width:64px">${z[1]} ${u}</b></div>`).join(""):`<p class="note" style="text-align:left">Belum ada data.</p>`};
+function renderAdmin(){
+  const v=$("fit");
+  if(!(ROLE==="kasir"?AUTHK:AUTH)){
+    v.innerHTML=`<h2>Login ${ROLE==="kasir"?"kasir":"admin"}</h2><label for="pin">PIN ${ROLE==="kasir"?"kasir":"admin"}</label><input type="password" id="pin" placeholder="PIN" inputmode="numeric"><div class="msg err" id="m"></div><button class="btn" onclick="login()">Masuk</button><button class="btn ghost" onclick="setRole('pelanggan')">← Kembali</button>`;
+    $("pin").addEventListener("keydown",e=>{if(e.key==="Enter")login()});return;
+  }
+  const np=DB.orders.filter(o=>o.st==="menunggu").length;
+  if(RV!==null&&DB.sales[RV]){
+    v.innerHTML=`<div class="noprint"><button class="btn ghost" style="margin:0 0 10px" onclick="closeStruk()">← Kembali</button></div>${HM?`<div class="msg ok noprint" style="margin:0 0 14px">${esc(HM)}</div>`:""}`+strukLog(DB.sales[RV])+`<button class="btn noprint" onclick="window.print()">Cetak struk</button>`;
+    return;
+  }
+  if(ROLE==="kasir"){
+    v.innerHTML=(AM?`<div class="alert">${AM}</div>`:"")+(HM?`<div class="msg ok" style="margin:0 0 16px">${esc(HM)}</div>`:"")+kasirUI()+`<button class="btn ghost noprint" onclick="logout()">Keluar kasir</button>`;
+    return;
+  }
+  let h=`<div class="chips big noprint" style="flex-wrap:wrap">${["Kasir","Film","Jadwal","Makanan","Pendapatan","Laporan","Log Pembayaran","Promo","Pengaturan"].map(t=>`<button style="font-size:.75rem;padding:10px 2px;flex:1 1 30%" class="${AT===t?"on":""}" onclick="AT='${t}';AM='';HM='';RF=-1;LP=0;RV=null;CX='';render()">${t==="Kasir"&&np?"Kasir ("+np+")":t}</button>`).join("")}</div><div class="noprint" style="height:20px"></div>${AM?`<div class="alert">${AM}</div>`:""}${HM?`<div class="msg ok" style="margin:0 0 16px">${esc(HM)}</div>`:""}`;
+  if(AT==="Kasir"){
+    h+=kasirUI();
+  }else if(AT==="Film"){
+    h+=`<h2>Daftar film (${FILMS.length})</h2>`+FILMS.map((f,i)=>`<div class="acard"><div class="row" style="border:0;padding:0 0 8px"><span><b style="color:var(--tx)">${esc(f.j)}</b><br><small>${esc(f.g)} · ${f.d} menit</small></span><button class="del" onclick="delFilm(${i})">Hapus</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label style="margin-bottom:4px">Audi</label><select style="padding:9px 10px;font-size:.85rem" onchange="setFilmAudi(${i},this.value)">${AUDI.map((a,k)=>`<option value="${k}" ${f.a===k?"selected":""}>${a.n}</option>`).join("")}</select></div><div><label style="margin-bottom:4px">Harga tiket (Rp)</label><input type="number" min="1" step="500" value="${f.h}" style="padding:9px 10px;font-size:.85rem" onchange="setFilmHarga(${i},this.value)"></div></div></div>`).join("")+
+    `<h2 style="margin-top:24px">Tambah film</h2><div class="fr"><input type="text" id="fj" placeholder="Judul film"><input type="text" id="fg" placeholder="Genre"><input type="number" id="fd" placeholder="Durasi (menit)" min="1"><input type="number" id="fp" placeholder="Harga tiket (Rp)" min="1" step="500"><label style="margin:6px 0 -2px">Ditayangkan di</label><select id="fa">${AUDI.map((a,k)=>`<option value="${k}">${a.n}</option>`).join("")}</select></div><button class="btn" onclick="addFilm()">Tambah film</button>`;
+  }else if(AT==="Jadwal"){
+    h+=`<h2>Atur tayangan</h2><div class="fr"><select id="sf">${FILMS.map(f=>`<option value="${esc(f.j)}">${esc(f.j)}</option>`).join("")}</select><input type="time" id="sj" value="13:00"></div><button class="btn" onclick="addShow()">Tambah tayangan</button><p class="note" style="text-align:left">Setiap audi dipakai sampai film selesai, ditambah jeda 15 menit untuk pembersihan.</p><h2 style="margin-top:24px">Jadwal tayang</h2>`+
+    FILMS.map(f=>{const ss=DB.shows.filter(x=>x.f===f.j).sort((a,b)=>a.j<b.j?-1:1);return `<div class="acard"><b>${esc(f.j)}</b> <small style="color:var(--mu)">· ${AUDI[f.a].n}</small>`+(ss.length?ss.map(x=>`<div class="row"><span>${x.j}</span><button class="del" onclick="delShow(${x.id})">Hapus</button></div>`).join(""):`<div class="note" style="text-align:left">Tidak tayang</div>`)+`</div>`}).join("");
+  }else if(AT==="Makanan"){
+    const IN=`type="number" inputmode="numeric" min="0" step="500" style="width:120px;padding:8px 10px;text-align:right;font-size:.9rem"`;
+    h+=`<h2>Menu makanan & minuman (${DB.menu.length})</h2>`+
+    (DB.menu.length?DB.menu.map((m,i)=>`<div class="row" style="align-items:center"><span style="color:var(--tx)">${esc(m.n)}</span><span style="display:flex;gap:8px;align-items:center"><input ${IN} value="${m.h}" onchange="setMenuHarga(${i},this.value)"><button class="del" onclick="delMenu(${i})">Hapus</button></span></div>`).join(""):`<p class="note" style="text-align:left">Belum ada menu.</p>`)+
+    `<div class="fr" style="margin-top:12px;grid-template-columns:1fr 130px"><input type="text" id="mn" placeholder="Nama item (mis. Nachos)"><input type="number" id="mh" placeholder="Harga" min="0" step="500"></div><button class="btn" onclick="addMenu()">Tambah item</button>
+    <h2 style="margin-top:24px">Paket bundling (${DB.paket.length})</h2>`+
+    DB.paket.map((p,pi)=>{const add=p.i.reduce((t,x)=>t+((DB.menu.find(m=>m.n===x)||{}).h||0),0);return `<div class="acard"><div class="row" style="border:0;padding:0 0 6px"><b>${esc(p.n)}</b><button class="del" onclick="delPaket(${pi})">Hapus</button></div><div class="chips" style="flex-wrap:wrap;margin:0 0 8px">${DB.menu.map((m,mi)=>`<button class="${p.i.includes(m.n)?"on":""}" style="flex:0 0 auto;padding:7px 12px;font-size:.82rem" onclick="togglePI(${pi},${mi})">${esc(m.n)}</button>`).join("")}</div><small class="k" style="margin:0">Tiket + ${p.i.length?esc(p.i.join(" + ")):"tanpa tambahan"} · tambahan ${rp(add)} di atas harga tiket film</small></div>`}).join("")+
+    `<div class="fr" style="margin-top:12px"><input type="text" id="pn" placeholder="Nama paket baru"></div><button class="btn" onclick="addPaket()">Tambah paket</button><p class="note" style="text-align:left">Pilihan "Tiket Saja" selalu tersedia. Harga paket = harga tiket film + harga isi paket. PPN mengikuti tarif di tab Pengaturan. Harga tiket diatur per film di tab Film.</p>`+foodUI();
+  }else if(AT==="Log Pembayaran"){
+    const L=DB.sales.slice().reverse(),PP=4,pg=Math.max(1,Math.ceil(L.length/PP));
+    LP=Math.min(Math.max(LP,0),pg-1);
+    h+=`<h2>Log pembayaran tiket (${L.length})</h2>`+(L.length?
+      L.slice(LP*PP,LP*PP+PP).map(x=>{
+        const w=new Date(x.t).toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+        return `<div class="acard"><div class="row" style="border:0;padding:0"><b>${esc(x.n||"-")}</b><b>${rp(x.amt)}</b></div>
+        ${x.px!==undefined?`<div class="lgs">Subtotal ${rp(x.sb)} + PPN ${pct(x.pr)} ${rp(x.px)}</div>`:""}
+        <div class="lgs">${esc(x.f)} · ${AUDI[x.a].n} · ${x.td||lk(x.t)} ${x.j}</div>
+        <div class="lgs">Kursi ${esc(x.ks||"-")} · ${x.tp} × ${x.q}</div>
+        <div class="lgs">${w} · ${esc(x.m)} · via ${esc(x.ch||"Kasir")}${x.by!==undefined?" · bayar "+rp(x.by):""}</div>
+        <div class="lgs" style="display:flex;justify-content:space-between;align-items:center">Kode: <b style="color:var(--tx)">${esc(x.k)}</b><button class="del" style="color:var(--tx);text-decoration:underline" onclick="viewStruk(${DB.sales.indexOf(x)})">Lihat struk</button></div>${x.rf?`<div class="lgs err"><b>REFUND</b> · ${new Date(x.rt).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`:rfUI(DB.sales.indexOf(x))}</div>`}).join("")+
+      `<div class="pg"><button class="btn ghost" ${LP?"":"disabled"} onclick="LP--;render()">← Terbaru</button><span>${LP+1} / ${pg}</span><button class="btn ghost" ${LP<pg-1?"":"disabled"} onclick="LP++;render()">Lama →</button></div>`
+      :`<p class="note">Belum ada pembayaran.</p>`);
+  }else if(AT==="Laporan"){
+    const L=repRecs(),T={tk:0,fd:0,px:0,tot:0,q:0,n:0,rf:0,rn:0},G={},I={},F={},J={};
+    L.forEach(o=>{const x=o.x;
+      if(x.rf){T.rf+=x.amt;T.rn++;return}
+      const z=o.fs?{tk:0,fd:x.sb,px:x.px,tot:x.amt,it:[]}:splitS(x);
+      T.tk+=z.tk;T.fd+=z.fd;T.px+=z.px;T.tot+=z.tot;T.n++;
+      const gk=RP==="Tahunan"?o.key.slice(0,7):o.key;G[gk]=G[gk]||{tk:0,fd:0,tot:0,n:0};G[gk].tk+=z.tk;G[gk].fd+=z.fd;G[gk].tot+=z.tot;G[gk].n++;
+      if(o.fs)x.it.forEach(i=>{I[i.n]=(I[i.n]||0)+i.q});
+      else{T.q+=x.q;z.it.forEach(n=>{I[n]=(I[n]||0)+x.q});F[x.f]=(F[x.f]||0)+x.q;J[x.j]=(J[x.j]||0)+x.q}});
+    const dt=new Date(RT+"T00:00:00");
+    const lbl=RP==="Harian"?dt.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"}):RP==="Bulanan"?BLN[+RT.slice(5,7)-1]+" "+RT.slice(0,4):"Tahun "+RT.slice(0,4);
+    const inp=RP==="Harian"?`<input type="date" value="${RT}" onchange="setRT(this.value)">`:RP==="Bulanan"?`<input type="month" value="${RT.slice(0,7)}" onchange="setRT(this.value+'-01')">`:`<input type="number" min="2000" max="2100" value="${RT.slice(0,4)}" onchange="if(this.value.length===4)setRT(this.value+'-01-01')">`;
+    const gl=k=>RP==="Tahunan"?BLN[+k.slice(5,7)-1]:new Date(k+"T00:00:00").toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short"});
+    const ALL={};DB.sales.forEach(x=>{if(!x.rf){const k=lk(x.t);ALL[k]=(ALL[k]||0)+x.amt}});DB.fsales.forEach(x=>{const k=lk(x.t);ALL[k]=(ALL[k]||0)+x.amt});
+    const tr=[];let trT;
+    if(RP==="Harian"){trT="7 hari terakhir";for(let k=6;k>=0;k--){const d=addD(RT,-k);tr.push([d.slice(8)+"/"+d.slice(5,7),ALL[d]||0])}}
+    else if(RP==="Bulanan"){trT="per tanggal";const nd=new Date(+RT.slice(0,4),+RT.slice(5,7),0).getDate();for(let d=1;d<=nd;d++)tr.push([String(d),ALL[RT.slice(0,7)+"-"+p2(d)]||0])}
+    else{trT="per bulan";for(let m=1;m<=12;m++){let t=0;for(const k in ALL)if(k.startsWith(RT.slice(0,4)+"-"+p2(m)))t+=ALL[k];tr.push([BLN[m-1].slice(0,3),t])}}
+    h+=`<div class="noprint"><div class="chips big">${["Harian","Bulanan","Tahunan"].map(p=>`<button class="${RP===p?"on":""}" onclick="setRP('${p}')">${p}</button>`).join("")}</div><div style="margin-top:10px">${inp}</div></div>
+    <h2 style="margin-top:20px">Laporan penjualan ${RP.toLowerCase()} · ${lbl}</h2>
+    <div class="acard"><small class="k">Total penjualan${T.rn?" (setelah refund)":""}</small><div class="big2">${rp(T.tot)}</div><small class="k" style="margin:6px 0 0">${T.q} tiket · ${T.n} transaksi</small>
+      <div class="row"><span>Tiket</span><b>${rp(T.tk)}</b></div><div class="row"><span>Makanan & minuman</span><b>${rp(T.fd)}</b></div><div class="row"${T.rn?"":' style="border:0"'}><span>PPN</span><b>${rp(T.px)}</b></div>${T.rn?`<div class="row" style="border:0"><span>Refund (${T.rn} transaksi)</span><b class="err">-${rp(T.rf)}</b></div>`:""}</div>
+    <h2 style="margin-top:20px">Grafik penjualan · ${trT}</h2><div class="acard">${colChart(tr)}</div>
+    <h2 style="margin-top:20px">Film terlaris</h2><div class="acard">${barChart(Object.entries(F).sort((a,b)=>b[1]-a[1]).slice(0,5),"tiket")}</div>
+    <h2 style="margin-top:20px">Jam paling ramai</h2><div class="acard">${barChart(Object.entries(J).sort((a,b)=>b[1]-a[1]),"tiket")}</div>`;
+    if(Object.keys(I).length)h+=`<h2 style="margin-top:20px">Makanan & minuman terjual</h2><div class="acard">`+Object.entries(I).map(([n,q])=>`<div class="row"><span>${esc(n)}</span><b>${q} porsi</b></div>`).join("")+`</div>`;
+    if(RP!=="Harian"&&Object.keys(G).length)h+=`<h2 style="margin-top:20px">Rincian ${RP==="Tahunan"?"per bulan":"per tanggal"}</h2><div class="acard">`+Object.keys(G).sort().map(k=>{const g=G[k];return `<div class="row"><span style="color:var(--tx)">${gl(k)}<br><small class="lgs">Tiket ${rp(g.tk)} · Makanan ${rp(g.fd)}</small></span><b>${rp(g.tot)}</b></div>`}).join("")+`</div>`;
+    h+=`<h2 style="margin-top:20px">Struk penjualan (${L.length})</h2>`+(L.length?`<div class="acard">`+L.map(o=>{const x=o.x,w=new Date(x.t).toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      return `<div class="row" style="align-items:center"><span style="color:var(--tx)"><b>${esc(x.n||"-")}</b><br><small class="lgs">${w} · ${o.fs?"Makanan konter":esc(x.f)} · ${esc(x.k)}${x.rf?" · REFUND":""}</small></span><span style="text-align:right"><b${x.rf?' class="err" style="text-decoration:line-through"':""}>${rp(x.amt)}</b>${o.fs?"":`<br><button class="del noprint" style="color:var(--tx);text-decoration:underline" onclick="viewStruk(${o.i})">Lihat struk</button>`}</span></div>`}).join("")+`</div>`:`<p class="note">Belum ada penjualan pada periode ini.</p>`)+
+    `<button class="btn noprint" onclick="exportCSV()">Unduh CSV (Excel)</button><button class="btn ghost noprint" onclick="window.print()">Cetak laporan</button>`;
+  }else if(AT==="Promo"){
+    h+=`<h2>Kode promo (${DB.promo.length})</h2>`+(DB.promo.length?DB.promo.map((p,i)=>`<div class="acard"><div class="row" style="border:0;padding:0 0 4px"><b>${esc(p.c)}</b><span style="display:flex;gap:12px"><button class="del" style="color:var(--tx)" onclick="togPromo(${i})">${p.on?"Nonaktifkan":"Aktifkan"}</button><button class="del" onclick="delPromo(${i})">Hapus</button></span></div><small class="lgs">Diskon ${p.t==="p"?p.v+"%":rp(p.v)} · ${p.h<0?"Setiap hari":"Hanya hari "+HARI[p.h]} · ${p.on?"Aktif":"Nonaktif"}</small></div>`).join(""):`<p class="note" style="text-align:left">Belum ada promo.</p>`)+
+    `<h2 style="margin-top:24px">Tambah promo</h2><div class="fr"><input type="text" id="pcd" placeholder="Kode (mis. PELAJAR)"><select id="pt"><option value="p">Diskon persen (%)</option><option value="n">Potongan rupiah (Rp)</option></select><input type="number" id="pv" placeholder="Nilai diskon" min="1" step="any"><select id="ph"><option value="-1">Setiap hari</option>${HARI.map((d,k)=>`<option value="${k}">Hanya hari ${d}</option>`).join("")}</select></div><button class="btn" onclick="addPromo()">Tambah promo</button><p class="note" style="text-align:left">Hari promo mengikuti tanggal tayang tiket. Diskon dihitung dari subtotal sebelum PPN. Pelanggan memasukkan kode di langkah pembayaran.</p>`;
+  }else if(AT==="Pengaturan"){
+    const c=DB.cfg,IM='type="number" min="0" step="500" style="width:120px;padding:8px 10px;text-align:right;font-size:.9rem"',IP='type="number" min="0" max="100" step="any" style="width:76px;padding:8px 10px;text-align:right;font-size:.9rem"',IS='type="number" min="0" max="200" step="any" style="width:76px;padding:8px 10px;text-align:right;font-size:.9rem"';
+    h+=`<h2>Tarif PPN bertingkat</h2><p class="note" style="text-align:left;margin:-6px 0 10px">Tarif ditentukan oleh harga per kursi (tiket + isi paket). Tiap tingkat berlaku sampai batas tingkat berikutnya.</p>`+
+    c.ppn.map((t,i)=>`<div class="row" style="align-items:center"><span style="display:flex;gap:8px;align-items:center;color:var(--tx)">Mulai Rp<input ${IM} ${i?"":"disabled"} value="${t.m}" onchange="setPpn(${i},'m',this.value)"></span><span style="display:flex;gap:8px;align-items:center"><input ${IP} value="${t.r}" onchange="setPpn(${i},'r',this.value)">%${i?`<button class="del" onclick="delPpn(${i})">Hapus</button>`:""}</span></div>`).join("")+
+    `<button class="btn ghost" onclick="addPpn()">+ Tambah tingkat</button>
+    <h2 style="margin-top:24px">Harga akhir pekan & jam malam</h2>
+    <div class="row" style="align-items:center"><span style="color:var(--tx)">Akhir pekan (Sabtu–Minggu)</span><span style="display:flex;gap:8px;align-items:center">+<input ${IS} value="${c.wk}" onchange="setCfg('wk',this.value)">%</span></div>
+    <div class="row" style="align-items:center"><span style="color:var(--tx)">Jam malam</span><span style="display:flex;gap:8px;align-items:center">+<input ${IS} value="${c.ml}" onchange="setCfg('ml',this.value)">%</span></div>
+    <div class="row" style="align-items:center"><span style="color:var(--tx)">Jam malam mulai pukul</span><input type="time" value="${c.jm}" style="width:130px;padding:8px 10px" onchange="setCfg('jm',this.value)"></div>`+
+    (FILMS.length?`<p class="note" style="text-align:left">Contoh: tiket ${esc(FILMS[0].j)} ${rp(FILMS[0].h)} menjadi ${rp(Math.round(FILMS[0].h*(1+(c.wk+c.ml)/100)/500)*500)} pada akhir pekan malam.</p>`:"")+
+    `<p class="note" style="text-align:left">Kenaikan hanya berlaku pada harga tiket film, tidak pada makanan. Jika kedua kondisi terpenuhi, persentasenya dijumlahkan. PPN ikut menyesuaikan karena dihitung dari harga per kursi.</p>`;
+  }else{
+    const M={};let T=0,Q=0,PX=0;
+    DB.shows.forEach(x=>{(M[x.f]=M[x.f]||{})[x.a+"|"+x.j]={a:x.a,j:x.j,q:0,r:0}});
+    DB.sales.forEach(x=>{if(x.rf)return;const k=x.a+"|"+x.j;M[x.f]=M[x.f]||{};M[x.f][k]=M[x.f][k]||{a:x.a,j:x.j,q:0,r:0};M[x.f][k].q+=x.q;M[x.f][k].r+=x.amt;T+=x.amt;PX+=(x.px||0);Q+=x.q});
+    let FT=0;DB.fsales.forEach(x=>{FT+=x.amt;PX+=x.px});T+=FT;const NT=DB.sales.filter(x=>!x.rf).length,RFL=DB.sales.filter(x=>x.rf);
+    h+=`<div class="acard"><small class="k">Total pendapatan</small><div class="big2">${rp(T)}</div><small class="k" style="margin:6px 0 0">${Q} tiket · ${NT+DB.fsales.length} transaksi</small><small class="k" style="margin:6px 0 0">Termasuk PPN ${rp(PX)}</small>${FT?`<small class="k" style="margin:6px 0 0">Termasuk makanan konter ${rp(FT)}</small>`:""}${RFL.length?`<small class="k err" style="margin:6px 0 0">Refund ${RFL.length} transaksi (${rp(RFL.reduce((t,x)=>t+x.amt,0))}) tidak dihitung</small>`:""}</div>`+
+    Object.entries(M).map(([f,o])=>{const rows=Object.values(o).sort((a,b)=>a.j<b.j?-1:1),fr=rows.reduce((t,x)=>t+x.r,0),fq=rows.reduce((t,x)=>t+x.q,0);
+      return `<div class="acard"><div class="row" style="border:0;padding:0 0 4px"><b>${esc(f)}</b><b>${rp(fr)}</b></div><small class="k">${fq} tiket terjual</small>`+rows.map(x=>`<div class="row"><span>${x.j} · ${AUDI[x.a].n}</span><b>${x.q} tiket · ${rp(x.r)}</b></div>`).join("")+`</div>`}).join("")+
+    `<button class="btn ghost" onclick="resetSales()">${RS?"Yakin? Tekan lagi untuk reset":"Reset penjualan & kursi"}</button>`;
+  }
+  v.innerHTML=h+`<button class="btn ghost noprint" onclick="logout()">Keluar admin</button>`;
+  if(AM)$("view").scrollTo({top:0,behavior:"smooth"});
+}
+if(location.hash==="#admin")ROLE="admin";else if(location.hash==="#kasir")ROLE="kasir";
+addEventListener("hashchange",()=>{ROLE=location.hash==="#admin"?"admin":location.hash==="#kasir"?"kasir":"pelanggan";REV=0;if(ROLE==="pelanggan")reset();render()});
+async function boot(){
+  await poll(true);
+  if(ORK){const o=DB.orders.find(x=>x.k===ORK);if(o&&o.st==="menunggu"){S.kode=o.k;S.step=6;S.ost=o.st;S.channel=o.ch;S.nama=o.n}}
+  render();
+  setInterval(poll,3000);
+}
+render();boot();
+</script>
+</body>
+</html>
